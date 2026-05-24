@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { AuthorsService } from '../authors/authors.service';
+import { PublishersService } from '../publishers/publishers.service';
 
 @Injectable()
 export class BooksService {
@@ -8,20 +9,26 @@ export class BooksService {
       id: 1,
       title: 'Pride and Prejudice',
       authorId: 1,
+      publisherId: 1,
     },
     {
       id: 2,
       title: 'Great Expectations',
       authorId: 2,
+      publisherId: 2,
     },
     {
       id: 3,
       title: 'The Adventures of Tom Sawyer',
       authorId: 3,
+      publisherId: 3,
     },
   ];
 
-  constructor(private readonly authorsService: AuthorsService) {}
+  constructor(
+    private readonly authorsService: AuthorsService,
+    private readonly publishersService: PublishersService,
+  ) {}
 
   findAll() {
     return this.books;
@@ -35,9 +42,10 @@ export class BooksService {
     return book;
   }
 
-  create(book: { title: string; authorId: number }) {
-    // Verify the author exists
+  create(book: { title: string; authorId: number; publisherId: number }) {
+    // Verify the author and publisher exist
     this.authorsService.findOne(book.authorId);
+    this.publishersService.findOne(book.publisherId);
 
     const newBook = {
       id: this.books.length > 0 ? Math.max(...this.books.map((b) => b.id)) + 1 : 1,
@@ -47,7 +55,7 @@ export class BooksService {
     return newBook;
   }
 
-  update(id: number, book: { title?: string; authorId?: number }) {
+  update(id: number, book: { title?: string; authorId?: number; publisherId?: number }) {
     const bookIndex = this.books.findIndex((b) => b.id === id);
 
     if (bookIndex === -1) {
@@ -57,6 +65,11 @@ export class BooksService {
     // If authorId is being updated, verify the author exists
     if (book.authorId) {
       this.authorsService.findOne(book.authorId);
+    }
+
+    // If publisherId is being updated, verify the publisher exists
+    if (book.publisherId) {
+      this.publishersService.findOne(book.publisherId);
     }
 
     this.books[bookIndex] = {
