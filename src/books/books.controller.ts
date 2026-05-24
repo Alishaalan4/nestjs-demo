@@ -25,14 +25,14 @@ export class BooksController {
   }
 
   @Post()
-  create(@Body() book: { title: string; authorId: number; publisherId: number }) {
+  create(@Body() book: { title: string; authorId: number; publisherId: number; genreIds: number[] }) {
     return this.booksService.create(book);
   }
 
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() book: { title?: string; authorId?: number; publisherId?: number },
+    @Body() book: { title?: string; authorId?: number; publisherId?: number; genreIds?: number[] },
   ) {
     return this.booksService.update(id, book);
   }
