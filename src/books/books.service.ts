@@ -35,16 +35,31 @@ export class BooksService {
     private readonly genresService: GenresService,
   ) {}
 
-  findAll() {
-    return this.books;
+  findAll(includeAuthor?: boolean) {
+    if (!includeAuthor) {
+      return this.books;
+    }
+
+    return this.books.map((book) => ({
+      ...book,
+      author: this.authorsService.findOne(book.authorId),
+    }));
   }
 
-  findOne(id: number) {
+  findOne(id: number, includeAuthor?: boolean) {
     const book = this.books.find((book) => book.id === id);
     if (!book) {
       throw new NotFoundException(`Book with ID ${id} not found`);
     }
-    return book;
+
+    if (!includeAuthor) {
+      return book;
+    }
+
+    return {
+      ...book,
+      author: this.authorsService.findOne(book.authorId),
+    };
   }
 
   create(book: { title: string; authorId: number; publisherId: number; genreIds: number[] }) {
